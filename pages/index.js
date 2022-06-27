@@ -31,7 +31,7 @@ export async function getServerSideProps() {
   const randomUsersResults = await fetch(
     'https://randomuser.me/api/?results=30&inc=name,login,picture'
   ).then((res=>res.json()));
-  console.log(randomUsersResults);
+
   return {
     props: {
       newResults,
