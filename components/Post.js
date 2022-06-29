@@ -1,13 +1,15 @@
 import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, HeartIcon, ShareIcon, TrashIcon } from "@heroicons/react/outline";
 import Moment from 'react-moment';
 import { collection, doc, onSnapshot, setDoc, deleteDoc } from "firebase/firestore";
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 import { useSession, signIn } from 'next-auth/react';
 import { useEffect, useState } from "react";
 import { HeartIcon as HeartIconFill } from '@heroicons/react/solid';
+import { deleteObject, ref } from "firebase/storage";
 
 export default function Post({post}) {
     const { data: session } = useSession();
+    const isOuner = post.data().id == session?.user.uid;
     const [likes, setLikes] = useState([]);
     const [hasLiked, setHasLiked] = useState(false);
     useEffect(() => {
@@ -32,6 +34,15 @@ export default function Post({post}) {
             signIn();
         }
     };
+
+    async function delPost() {
+        if (window.confirm('Are ypu sure yuo want to delete this post?')) {
+            await deleteDoc(doc(db, 'posts', post.id));
+            if (post.data().image) {
+                deleteObject(ref(storage, `posts/${post.id}/image`));
+            }
+        }
+    }
   return (
     <div className="flex p-3 cursor-pointer border-b border-gray-200">
         {/* image */}
@@ -60,7 +71,9 @@ export default function Post({post}) {
 
             <div className="flex justify-center justify-between text-gray-500 p-2"> {/* Icons */}
                 <ChatIcon className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"/>
-                <TrashIcon className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"/>
+                {isOuner && 
+                    <TrashIcon onClick={delPost} className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"/>
+                }
                 <div className="flex items-center">
                     {hasLiked 
                     ?   <HeartIconFill onClick={likePost} className="h-9 w-9 hoverEffect p-2 text-red-600 hover:bg-red-100"/>
