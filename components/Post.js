@@ -64,7 +64,7 @@ export default function Post({post}) {
                 </div>
                 <DotsHorizontalIcon className="h-10 w-10 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100 ml-auto"/> {/* dots icon */}
             </div>
-            <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2"> {/* post text */}
+            <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2 w-full truncate"> {/* post text */}
                 {post.data().text}
             </p>
             <img className="rounded-2xl mr-2" src={post.data().image} alt="" />  
