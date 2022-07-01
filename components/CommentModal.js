@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { onSnapshot, doc } from 'firebase/firestore';
 import Moment from 'react-moment';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut, signIn } from 'next-auth/react';
 import { EmojiHappyIcon, PhotographIcon, XIcon } from "@heroicons/react/outline";
 
 
@@ -66,7 +66,6 @@ export default function CommentModal() {
                     {session ? (
                         <div className='flex border-gray-200 p-3 space-x-3'>
                         <img 
-                            onClick={signOut}
                             src={session.user.image}
                             alt="user-img"
                             className="h-11 w-11 rounded-full cursor-pointer hover:brightness-95"
@@ -114,7 +113,12 @@ export default function CommentModal() {
                         </div>
                     </div>
                     ) : (
-                        <span className=''>button!</span>
+                        <div className='flex p-2'>
+                            <button 
+                                className="ml-auto bg-red-400 text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:brightness-95"
+                                onClick={signIn}
+                            >Sign In</button>
+                        </div>
                     )}
                     
                 </div>

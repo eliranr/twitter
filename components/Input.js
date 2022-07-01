@@ -62,7 +62,7 @@ export default function Input( { itsComment } ) {
                     <textarea 
                         className="w-full border-none focus:ring-0 text-lg placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
                         rows='2' 
-                        placeholder={itsComment ? "What`s happening?" : 'Tweet Your reply'}
+                        placeholder="What`s happening?"
                         value={input}
                         onChange={(e)=>setInput(e.target.value)}>
                     </textarea>
