@@ -9,8 +9,8 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export default function Feed() {
     const [posts, setPosts] = useState([]);
-    useEffect(
-        () => onSnapshot(
+    useEffect(() => 
+        onSnapshot(
                 query(collection(db, 'posts'),
                 orderBy('timestamp', 'desc')),
                 (snapshot) => {
@@ -27,7 +27,7 @@ export default function Feed() {
                 <SparklesIcon className='h-5' />
             </div>
         </div>
-        <Input />
+        <Input itsComment={false}/>
         <AnimatePresence>
             {posts.map((post) => (
                 <motion.div 

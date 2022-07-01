@@ -5,7 +5,7 @@ import { db, storage } from '../firebase';
 import { addDoc, collection, serverTimestamp, doc, updateDoc  } from "firebase/firestore";
 import { getDownloadURL, uploadString, ref } from "firebase/storage";
 
-export default function Input() {
+export default function Input( { itsComment } ) {
     const {data: session} = useSession();
     const [input, setInput] = useState('');
     const [slectedFile, SetSlectedFile] = useState();
@@ -50,7 +50,7 @@ export default function Input() {
   return (
     <>
     {session && (
-            <div className='flex border-b border-gray-200 p-3 space-x-3'>
+        <div className='flex border-b border-gray-200 p-3 space-x-3'>
             <img 
                 onClick={signOut}
                 src={session.user.image}
@@ -62,7 +62,7 @@ export default function Input() {
                     <textarea 
                         className="w-full border-none focus:ring-0 text-lg placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
                         rows='2' 
-                        placeholder="What`s happening?"
+                        placeholder={itsComment ? "What`s happening?" : 'Tweet Your reply'}
                         value={input}
                         onChange={(e)=>setInput(e.target.value)}>
                     </textarea>
@@ -94,7 +94,7 @@ export default function Input() {
                         className="bg-blue-400 text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:brightness-95 disabled:opacity-50"
                         onClick={sendPost}
                         disabled={!input.trim()}
-                    >Tweet</button>
+                    >{itsComment ? "Reply" : 'Tweet'}</button>
                     </>
                     )}
                 </div>
