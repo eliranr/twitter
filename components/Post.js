@@ -17,6 +17,7 @@ export default function Post({post}) {
     const [hasLiked, setHasLiked] = useState(false);
     const [open, setOpen] = useRecoilState(modalState);
     const [postId, setPostId] = useRecoilState(postIdState);
+    const [comments, setComments] = useState([]);
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
@@ -40,6 +41,12 @@ export default function Post({post}) {
             signIn();
         }
     };
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            collection(db, 'posts', post.id, 'comments'), (snapshot) => setComments(snapshot.docs)
+        )
+    }, [db]);
 
     async function delPost() {
         if (window.confirm('Are ypu sure yuo want to delete this post?')) {
@@ -76,6 +83,7 @@ export default function Post({post}) {
             <img className="rounded-2xl mr-2" src={post.data().image} alt="" />  
 
             <div className="flex justify-center justify-between text-gray-500 p-2"> {/* Icons */}
+            <div className="flex items-center select-none">
                 <ChatIcon 
                     onClick={()=> {
                         setPostId(post.id);
@@ -83,6 +91,11 @@ export default function Post({post}) {
                     }} 
                     className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
                 />
+                {comments.length > 0 && (
+                    <span className='text-sm'>{comments.length}</span>
+                )}
+            </div>
+                
                 {isOuner && 
                     <TrashIcon onClick={delPost} className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"/>
                 }

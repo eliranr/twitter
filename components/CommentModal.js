@@ -3,10 +3,12 @@ import {modalState, postIdState} from '../atom/modalAtom';
 import Modal from 'react-modal';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
-import { onSnapshot, doc } from 'firebase/firestore';
+import { onSnapshot, doc, setDoc, addDoc, serverTimestamp, collection, query } from 'firebase/firestore';
 import Moment from 'react-moment';
 import { useSession, signOut, signIn } from 'next-auth/react';
 import { EmojiHappyIcon, PhotographIcon, XIcon } from "@heroicons/react/outline";
+import { async } from '@firebase/util';
+import {useRouter} from 'next/router';
 
 
 export default function CommentModal() {
@@ -15,6 +17,8 @@ export default function CommentModal() {
     const [postId, setPostId] = useRecoilState(postIdState);
     const { data: session } = useSession();
     const [inputComment, setInputComment] = useState('');
+    const [listComments, setListComments] = useState([]);
+    const router = useRouter();
 
     useEffect(() => {
         onSnapshot(
@@ -25,8 +29,25 @@ export default function CommentModal() {
         )
     }, [postId, db]);
 
-    const sendComment = () => {
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            query(collection(db, 'posts', postId, 'comments')), (snapshot) => {
+                console.log(snapshot.docs);
+                setListComments(snapshot.docs);
+            }
+        )
+    }, [db]);
 
+    const sendComment = async () => {
+        await addDoc(collection(db, 'posts', postId, 'comments'), {
+            text: inputComment,
+            user_session: session.user,
+            timestamp: serverTimestamp(),
+        });
+        setInputComment('');
+        setOpen(false);
+        console.log('aaaaaaaaaa');
+        router.push(`posts/${postId}`);
     }
   return (
     <div>
@@ -62,6 +83,12 @@ export default function CommentModal() {
                     <p className="text-gray-500 text-[15px] sm:text-[16px] ml-16 mb-2  "> {/* post text */}
                         {post?.data()?.text}
                     </p>
+                    <div>
+                    {listComments.map((commentItem) => {
+                        console.log(commentItem?.data()); ///////////////////// פה הפסקת!
+                        return (<h1 key={commentItem?.data()?.text}>{commentItem?.data()?.text}</h1>)
+                    })}
+                    </div>
                     {/*  Input  */}
                     {session ? (
                         <div className='flex border-gray-200 p-3 space-x-3'>
