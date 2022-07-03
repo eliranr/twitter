@@ -9,19 +9,21 @@ import { deleteObject, ref } from "firebase/storage";
 
 import {useRecoilState} from 'recoil';
 import {modalState, postIdState} from '../atom/modalAtom';
+import {useRouter} from 'next/router';
 
-export default function Post({post}) {
+export default function Post({post, id}) {
     const { data: session } = useSession();
-    const isOuner = post.data().id == session?.user.uid;
+    const isOuner = post?.data()?.id == session?.user.uid;
     const [likes, setLikes] = useState([]);
     const [hasLiked, setHasLiked] = useState(false);
     const [open, setOpen] = useRecoilState(modalState);
     const [postId, setPostId] = useRecoilState(postIdState);
     const [comments, setComments] = useState([]);
+    const router = useRouter();
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
-            collection(db, 'posts', post.id, 'likes'), (snapshot) => setLikes(snapshot.docs)
+            collection(db, 'posts', id, 'likes'), (snapshot) => setLikes(snapshot.docs)
         )
     }, [db]);
     useEffect(() => {
@@ -31,9 +33,9 @@ export default function Post({post}) {
     async function likePost() {
         if (session) {
             if (hasLiked) {
-                await deleteDoc(doc(db, 'posts', post.id, 'likes', session?.user.uid));
+                await deleteDoc(doc(db, 'posts', id, 'likes', session?.user.uid));
             } else {
-                await setDoc(doc(db, 'posts', post.id, 'likes', session?.user.uid), {
+                await setDoc(doc(db, 'posts', id, 'likes', session?.user.uid), {
                     username: session.user.username
                 });
             }
@@ -44,16 +46,17 @@ export default function Post({post}) {
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
-            collection(db, 'posts', post.id, 'comments'), (snapshot) => setComments(snapshot.docs)
+            collection(db, 'posts', id, 'comments'), (snapshot) => setComments(snapshot.docs)
         )
     }, [db]);
 
     async function delPost() {
         if (window.confirm('Are ypu sure yuo want to delete this post?')) {
-            await deleteDoc(doc(db, 'posts', post.id));
-            if (post.data().image) {
-                deleteObject(ref(storage, `posts/${post.id}/image`));
+            await deleteDoc(doc(db, 'posts', id));
+            if (post?.data()?.image) {
+                deleteObject(ref(storage, `posts/${id}/image`));
             }
+            router.push('/')
         }
     }
   return (
@@ -61,32 +64,32 @@ export default function Post({post}) {
         {/* image */}
         <img 
             className="h-11 w-11 rounded-full mr-4"
-            src={post.data().user_session.image}
+            src={post?.data()?.user_session.image}
             alt='user-img'
         />
         <div className='w-full'> {/* right side */}
             <div className="flex items-center justify-between"> {/* Hedear */}
                 <div className="flex items-center space-x-1 whitespace-nowrap"> {/* post user info */}
-                    <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">{post.data().user_session.name}</h4>
-                    <span className='text-sm sm:text-[15px]'>@{post.data().user_session.username} -</span>
+                    <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">{post?.data()?.user_session.name}</h4>
+                    <span className='text-sm sm:text-[15px]'>@{post?.data()?.user_session.username} -</span>
                     <span className='text-sm sm:text-[15px] hover:underline'>
                         <Moment fromNow>
-                            {post?.data().timestamp?.toDate()}
+                            {post?.data()?.timestamp?.toDate()}
                         </Moment>
                     </span>
                 </div>
                 <DotsHorizontalIcon className="h-10 w-10 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100 ml-auto"/> {/* dots icon */}
             </div>
             <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2 w-full truncate"> {/* post text */}
-                {post.data().text}
+                {post?.data()?.text}
             </p>
-            <img className="rounded-2xl mr-2" src={post.data().image} alt="" />  
+            <img className="rounded-2xl mr-2" src={post?.data()?.image} alt="" />  
 
             <div className="flex justify-center justify-between text-gray-500 p-2"> {/* Icons */}
             <div className="flex items-center select-none">
                 <ChatIcon 
                     onClick={()=> {
-                        setPostId(post.id);
+                        setPostId(id);
                         setOpen(!open);
                     }} 
                     className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
