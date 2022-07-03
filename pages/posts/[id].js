@@ -6,17 +6,31 @@ import Post from '../../components/Post';
 import { useRouter } from 'next/router';
 import { ArrowLeftIcon } from '@heroicons/react/outline';
 import { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { comment } from 'postcss';
+import Comment from '../../components/Comment';
 
 export default function PostPage({newResults, randomUsersResults}) {
     const router = useRouter();
     const { id } = router.query;
     const [post, setPost] = useState();
+    const [comments, setComments] = useState([]);
 
     useEffect(() => {
         onSnapshot(doc(db, 'posts', id), (snapshot) => setPost(snapshot));
-    }, [db, id])
+    }, [db, id]);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            query(
+                collection(db, 'posts', id, 'comments'),
+                orderBy('timestamp', 'desc')
+            )
+            , (snapshot) => setComments(snapshot.docs)
+        )
+    }, [db, id]);
+
   return (
     <div>
       <Head>
@@ -38,6 +52,11 @@ export default function PostPage({newResults, randomUsersResults}) {
                 </h2>
             </div>
             <Post id={id} post={post} />
+            <div className=''>
+                {comments.map((comment) => 
+                    <Comment key={comment.id} id={comment.id} comment={comment.data()} />
+                )}
+            </div>
         </div>
 
 
