@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { db, storage } from '../firebase';
 import { addDoc, collection, serverTimestamp, doc, updateDoc  } from "firebase/firestore";
 import { getDownloadURL, uploadString, ref } from "firebase/storage";
+import Image from 'next/image';
 
 export default function Input( { itsComment } ) {
     const {data: session} = useSession();
@@ -55,6 +56,10 @@ export default function Input( { itsComment } ) {
                 onClick={signOut}
                 src={session.user.image}
                 alt="user-img"
+                onError={({ currentTarget }) => {
+                    currentTarget.onerror = null; // prevents looping
+                    currentTarget.src="/man.png";
+                }}
                 className="h-11 w-11 rounded-full cursor-pointer hover:brightness-95"
             />
             <div className='w-full divide-y divide-gray-200'>

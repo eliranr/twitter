@@ -35,6 +35,10 @@ export default function Sidebar() {
                     src={session.user.image}
                     alt='user-img'
                     className='h-10 w-10 rounded-full xl:mr-2'
+                    onError={({ currentTarget }) => {
+                        currentTarget.onerror = null; // prevents looping
+                        currentTarget.src="/man.png";
+                    }}
                 />
                 <div className='leading-5 hidden xl:inline'>
                     <h4 className='font-bold'>{session.user.name}</h4>

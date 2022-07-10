@@ -66,6 +66,10 @@ export default function Post({post, id}) {
             className="h-11 w-11 rounded-full mr-4"
             src={post?.data()?.user_session.image}
             alt='user-img'
+            onError={({ currentTarget }) => {
+                currentTarget.onerror = null; // prevents looping
+                currentTarget.src="/man.png";
+            }}
         />
         <div className='w-full'> {/* right side */}
             <div className="flex items-center justify-between"> {/* Hedear */}

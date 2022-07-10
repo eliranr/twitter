@@ -68,6 +68,10 @@ export default function CommentModal() {
                             className="h-11 w-11 rounded-full mr-40 "
                             src={post?.data()?.user_session.image}
                             alt='user-img'
+                            onError={({ currentTarget }) => {
+                                currentTarget.onerror = null; // prevents looping
+                                currentTarget.src="/man.png";
+                            }}
                         />
                         <div className='flex items-center space-x-1 pl-2'>
                             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">{post?.data()?.user_session.name}</h4>
@@ -94,6 +98,10 @@ export default function CommentModal() {
                         <img 
                             src={session.user.image}
                             alt="user-img"
+                            onError={({ currentTarget }) => {
+                                currentTarget.onerror = null; // prevents looping
+                                currentTarget.src="/man.png";
+                            }}
                             className="h-11 w-11 rounded-full cursor-pointer hover:brightness-95"
                         />
                         <div className='w-full divide-y divide-gray-200'>
